@@ -1,19 +1,4 @@
-# From backend dir run the following to create virtual environment
-python3.9 -m venv venv
-
-# Activate the virtual env
-source venv/bin/activate #macos/linux
-venv\Scripts\activate #windows
-
-# Set API Key as gloabl var
-export OPENAI_API_KEY="" # find it from whatsappchat
-
-pip install --upgrade pip
-pip install -r requirements.txt
-
-# start the server
-uvicorn main:app --reload --port 8000
-
+# Use the following instructions to start backend server, run from ./backend directory in a seperate shell
 
 # Deactivate the current virtual environment if it's active
 deactivate
@@ -30,6 +15,9 @@ source venv/bin/activate
 
 # For Windows (Command Prompt):
 venv\Scripts\activate
+
+# Set API Key as gloabl var
+export OPENAI_API_KEY="" # find it from whatsappchat
 
 # Upgrade pip to the latest version
 pip install --upgrade pip
