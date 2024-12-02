@@ -155,3 +155,16 @@ body{
   }
 }
 
+/* Typing Indicator */
+.typing-indicator {
+  font-style: italic;
+  color: gray;
+  margin: 10px 0;
+}
+
+/* Message Status */
+.message-status {
+  font-size: 0.8rem;
+  color: gray;
+  margin-left: 5px;
+}

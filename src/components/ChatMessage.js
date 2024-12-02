@@ -1,32 +1,38 @@
 import React from 'react';
-import { Typography, Avatar } from '@mui/material';
+import { Typography } from '@mui/material';
 
 const ChatMessage = ({ message }) => {
   return (
     <div
-      key={message.text}
       style={{
         display: 'flex',
-        alignItems: 'center',
+        justifyContent: message.isUserMessage ? 'flex-end' : 'flex-start',
         marginBottom: 10,
       }}
     >
-      {!message.isUserMessage && message.withAvatar && (
-        <Avatar alt="Bot Avatar" src="my-chatbot-app/public/avatar.png" style={{ marginRight: 10 }} />
-      )}
       <div
         style={{
-          backgroundColor: message.isUserMessage ? '#E3F2FD' : '#BBDEFB',
+          backgroundColor: message.isUserMessage ? '#e0f7fa' : '#f1f8e9',
           padding: 10,
           borderRadius: 10,
           maxWidth: '70%',
         }}
       >
-        <Typography variant="body1">{message.text}</Typography>
+        <Typography variant="body2">{message.text}</Typography>
+
+        {/* Show status for user messages */}
+        {message.isUserMessage && (
+          <Typography
+          variant="caption"
+          style={{
+          textAlign: 'right',
+          display: 'none', // Hide the status
+        }}
+  >
+    {message.status}
+  </Typography>
+)}
       </div>
-      {message.isUserMessage && (
-        <Avatar alt="User Avatar" src='my-chatbot-app/public/avatar.png' style={{ marginLeft: 10 }} />
-      )}
     </div>
   );
 };

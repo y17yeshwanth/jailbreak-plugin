@@ -16,7 +16,7 @@ source venv/bin/activate
 # For Windows (Command Prompt):
 venv\Scripts\activate
 
-# Set API Key as gloabl var
+# Set API Key as gloabl varrm
 export OPENAI_API_KEY="" # find it from whatsappchat
 
 # Upgrade pip to the latest version

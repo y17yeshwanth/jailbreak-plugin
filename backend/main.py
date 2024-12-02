@@ -53,18 +53,31 @@ def generate_response(user_query):
         ai_response = ai_response[len(user_query):].strip()
     return ai_response
 
+mock_orders = {
+    "1234": "Shipped, arriving in 2 days.",
+    "5678": "Out for delivery, arriving today by 5 PM.",
+    "9101": "Processing, expected to ship tomorrow.",
+}
+
 @app.post("/api/chatbot/assess")
 async def assess_query(chat_request: ChatRequest):
     user_query = chat_request.input_text.strip()
 
-    if user_query in jailbreak_queries:
+    if user_query.lower() == "track my order":
+        # Simulate tracking data
         return {
-            "response": "You are attempting to jailbreak.",
-            "jailbreak_detected": True
+            "response": "Please provide your order number to track it.",
+            "jailbreak_detected": False
+        }
+    elif user_query.lower().startswith("order #"):
+        order_id = user_query.split("#")[1].strip()
+        order_status = mock_orders.get(order_id, "Order not found.")
+        return {
+            "response": f"Order #{order_id}: {order_status}",
+            "jailbreak_detected": False
         }
     else:
         try:
-            # Generate a response using the Hugging Face model
             ai_response = generate_response(user_query)
             return {
                 "response": ai_response,
