@@ -24,6 +24,7 @@ pip install --upgrade pip
 
 # Install the required packages
 pip install transformers torch fastapi uvicorn
+pip install -r requirements.txt
 
 # Verify installation
 pip list
