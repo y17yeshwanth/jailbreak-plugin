@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+// export default ChatWindow;
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Typography,
   TextField,
@@ -16,6 +17,7 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import ChatMessage from './ChatMessage'; // Import the updated ChatMessage component
 
 const ChatWindow = ({ messages, onSendMessage, inputDisabled, isTyping }) => {
   const [messageInput, setMessageInput] = useState('');
@@ -61,7 +63,20 @@ const ChatWindow = ({ messages, onSendMessage, inputDisabled, isTyping }) => {
     },
   ]);
 
+  const [intentsClicked, setIntentsClicked] = useState(false); // Tracks if intents have been interacted with
+
+  useEffect(() => {
+    // Scroll to the bottom whenever messages change
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages, isTyping]);
+
   const handleIntentClick = (intent) => {
+    if (intentsClicked) return; // Prevent further clicks on intents
+
+    setIntentsClicked(true); // Set to true once an intent is clicked
+
     if (intent === 'Track My Order') {
       // Show orders excluding or marking canceled ones
       const newIntents = hardcodedOrders.map((order) => ({
@@ -103,11 +118,10 @@ const ChatWindow = ({ messages, onSendMessage, inputDisabled, isTyping }) => {
       // For other intents, clear intents and reset
       setIntents(['Track My Order', 'FAQ']);
     }
-  
+
     // Send the intent to the bot
     onSendMessage(intent.description || intent);
   };
-  
 
   return (
     <Paper
@@ -152,24 +166,15 @@ const ChatWindow = ({ messages, onSendMessage, inputDisabled, isTyping }) => {
           marginBottom: 20,
           overflowY: 'auto',
           flexGrow: 1,
-          marginRight: -20,
           paddingRight: 20,
         }}
       >
         {messages.map((message, index) => (
-          <Typography key={index}>{message.text}</Typography>
+          <ChatMessage key={index} message={message} />
         ))}
 
         {isTyping && (
-          <div
-            style={{
-              fontStyle: 'italic',
-              color: 'gray',
-              marginTop: 5,
-            }}
-          >
-            Bot is typing...
-          </div>
+          <ChatMessage message={{ isUserMessage: false, text: 'Bot is typing...' }} />
         )}
 
         {selectedOrder && !selectedOrder.cancelled && (
@@ -181,7 +186,7 @@ const ChatWindow = ({ messages, onSendMessage, inputDisabled, isTyping }) => {
               alternativeLabel
               activeStep={selectedOrder.progress.indexOf(selectedOrder.status)}
             >
-              {selectedOrder.progress.map((step, index) => (
+              {selectedOrder.progress.map((step) => (
                 <Step key={step}>
                   <StepLabel
                     StepIconComponent={({ active, completed }) => {
@@ -208,65 +213,67 @@ const ChatWindow = ({ messages, onSendMessage, inputDisabled, isTyping }) => {
         )}
       </div>
 
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-          gap: 2,
-          marginBottom: 2,
-        }}
-      >
-        {intents.map((intent) =>
-          typeof intent === 'string' ? (
-            <Chip
-              key={intent}
-              label={intent}
-              onClick={() => handleIntentClick(intent)}
-              sx={{
-                cursor: 'pointer',
-                backgroundColor: '#e0f7fa',
-                color: '#00695c',
-                fontWeight: 'bold',
-                borderRadius: '12px',
-                padding: '8px 16px',
-                textAlign: 'center',
-                fontSize: '0.75rem',
-              }}
-            />
-          ) : (
-            <Card
-              key={intent.id}
-              sx={{
-                width: '90%',
-                backgroundColor: '#ffffff',
-                padding: 1,
-                boxShadow: 3,
-                borderRadius: '12px',
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6">{intent.description}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Order #{intent.id}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="small"
-                  onClick={() => handleIntentClick(intent)}
-                  sx={{
-                    color: intent.cancelAction ? 'red' : '#00695c',
-                    fontWeight: 'bold',
-                    textTransform: 'capitalize',
-                  }}
-                >
-                  {intent.cancelAction ? 'Cancel Order' : 'View Progress'}
-                </Button>
-              </CardActions>
-            </Card>
-          )
-        )}
-      </Box>
+      {!intentsClicked && ( // Display intents only if they haven't been clicked
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+            gap: 2,
+            marginBottom: 2,
+          }}
+        >
+          {intents.map((intent) =>
+            typeof intent === 'string' ? (
+              <Chip
+                key={intent}
+                label={intent}
+                onClick={() => handleIntentClick(intent)}
+                sx={{
+                  cursor: 'pointer',
+                  backgroundColor: '#e0f7fa',
+                  color: '#00695c',
+                  fontWeight: 'bold',
+                  borderRadius: '12px',
+                  padding: '8px 16px',
+                  textAlign: 'center',
+                  fontSize: '0.75rem',
+                }}
+              />
+            ) : (
+              <Card
+                key={intent.id}
+                sx={{
+                  width: '90%',
+                  backgroundColor: '#ffffff',
+                  padding: 1,
+                  boxShadow: 3,
+                  borderRadius: '12px',
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6">{intent.description}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Order #{intent.id}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    size="small"
+                    onClick={() => handleIntentClick(intent)}
+                    sx={{
+                      color: intent.cancelAction ? 'red' : '#00695c',
+                      fontWeight: 'bold',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {intent.cancelAction ? 'Cancel Order' : 'View Progress'}
+                  </Button>
+                </CardActions>
+              </Card>
+            )
+          )}
+        </Box>
+      )}
 
       {inputDisabled && (
         <Typography variant="body2" color="error" style={{ marginBottom: 10 }}>
@@ -296,6 +303,5 @@ const ChatWindow = ({ messages, onSendMessage, inputDisabled, isTyping }) => {
     </Paper>
   );
 };
-
 
 export default ChatWindow;
